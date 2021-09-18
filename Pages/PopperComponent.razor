@@ -1,0 +1,43 @@
+@using TestSwiper.Wrappers
+@inject Popper _popper
+
+
+<div @onclick="@(() => _popperIsActive = !_popperIsActive)" class="h-10 w-10" id="reference" @ref=_reference style="background-color:blue;">Reference</div>
+<div class="h-[200px] w-[200px] shadow-lg overflow-scroll @(_popperIsActive ? "" : "hidden")" id="popper" @ref=_popperElement style="background-color:red;">
+    <div data-popper-arrow>sda</div>
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aperiam architecto cumque cupiditate dicta ducimus, inventore iure mollitia nesciunt nulla numquam odio qui quibusdam, quis ratione repudiandae rerum sed temporibus voluptatem. Consequatur incidunt ipsa magnam nesciunt vel? Ducimus esse laboriosam laudantium temporibus velit voluptate! Alias corporis eius est facilis necessitatibus nihil repellat. Ab adipisci aliquam, cum dolorum eius illum ipsam itaque laudantium non nostrum omnis pariatur possimus recusandae rerum vel. Cum debitis deserunt doloremque eveniet labore magnam, nam nobis optio pariatur sit, temporibus vero! A accusamus alias animi asperiores deserunt, dolore doloribus eius eligendi esse exercitationem fuga fugiat illo impedit ipsa laborum magni necessitatibus odit omnis pariatur placeat praesentium quod rem sapiente sunt, tempora tempore voluptatem! Ab aperiam at, atque commodi consequuntur corporis dolor ea hic, id incidunt iure nemo perferendis quidem quos, recusandae sunt tempore. Accusamus accusantium ad delectus deleniti earum eius explicabo hic, modi necessitatibus numquam officia perferendis recusandae sed ullam voluptate! Ab adipisci asperiores commodi culpa dicta eius exercitationem ipsa iure magni maxime nam, natus nihil nulla numquam omnis optio porro quasi quidem repellat rerum sapiente tempore totam vel voluptas voluptates. Aperiam corporis cumque cupiditate debitis eos eum exercitationem, incidunt mollitia nihil optio pariatur quas quia rerum suscipit?
+</div>
+
+@code {
+    private ElementReference _reference;
+
+    private ElementReference _popperElement;
+
+    private bool _popperIsActive = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var options = new PopperOptions()
+            {
+                Placement = Placement.RightEnd,
+                Modifiers = new List<object>()
+                {
+                    new
+                    {
+                        name = "offset",
+                        options = new
+                        {
+                            offset = new List<int>() {10, 10}
+                        }
+                    }
+                }
+            };
+            await _popper.CreatePopperAsync(_reference, _popperElement, options);
+            _popperIsActive = false;
+            StateHasChanged();
+        }
+    }
+
+}

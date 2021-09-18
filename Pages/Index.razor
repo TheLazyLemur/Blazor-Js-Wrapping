@@ -1,0 +1,46 @@
+@page "/"
+
+<div class="flex">
+    <PopperComponent/>
+    <PopperComponent/>
+</div>
+
+<div class="p-10">
+    <div class="h-[400px] w-full">
+        <Chart Labels="@Labels" Values="@GetValues()" Type="line" BackgroundColors="@BackgroundColors" BorderColors="@BackgroundColors"/>
+    </div>
+    <div class="grid grid-cols-2 !h-[400px]">
+        <Chart Labels="@Labels" Values="@GetValues()"  Type="pie" BackgroundColors="@BackgroundColors" BorderColors="@BackgroundColors"/>
+        <Chart Labels="@Labels" Values="@GetValues()"  Type="bar" BorderRadius="@(10)" BackgroundColors="@BackgroundColors" BorderColors="@BackgroundColors"/>
+    </div>
+</div>
+
+
+
+@code{
+
+    private static readonly Random Random = new();
+    
+    private List<string> Labels = new List<string>()
+    {
+        "Monday","Tuesday","Wednesday","Thursday","Friday"
+    };
+
+    private List<string> BackgroundColors = new List<string>()
+    {
+        "#33CCFF","#181818","#990033","#278CDA","#E40066"
+    };
+
+    public List<int> GetValues()
+    {
+        var vals = new List<int>();
+
+        for (var i = 0; i < Labels.Count; i++)
+        {
+           vals.Add(Random.Next(0, 100)); 
+        }
+
+        return vals;
+    }
+
+}

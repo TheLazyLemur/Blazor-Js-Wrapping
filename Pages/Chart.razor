@@ -1,0 +1,130 @@
+<div class="h-full">
+    <canvas id="myChart" @ref="@_elementReference"></canvas>
+</div>
+
+
+@code{
+
+    public class Dataset
+    {
+        public string Label { get; }
+        public List<string> BorderColor { get; }
+        public List<int> Data { get; }
+        public int BorderRadius { get; }
+        public List<string> BackgroundColor { get; set; }
+
+        public Dataset(string label, List<string> borderColor, List<int> data, int borderRadius, List<string> backgroundColor = null)
+        {
+            Label = label;
+            BorderColor = borderColor;
+            Data = data;
+            BorderRadius = borderRadius;
+            BackgroundColor = backgroundColor;
+        }
+    }
+
+    public class ChartJsData
+    {
+        public List<string> Labels { get; }
+        public List<Dataset> Datasets { get; }
+
+        public ChartJsData(List<string> labels, List<Dataset> datasets)
+        {
+            Labels = labels;
+            Datasets = datasets;
+        }
+    }
+
+    [Inject]
+    public IJSRuntime JsRuntime { get; set; }
+
+    private IJSObjectReference _jsObjectReference;
+    private ElementReference _elementReference;
+
+    [Parameter]
+    public string Type { get; set; }
+
+    [Parameter]
+    public List<string> Labels { get; set; }
+
+    [Parameter]
+    public List<int> Values { get; set; }
+    
+    [Parameter]
+    public List<string> BackgroundColors { get; set; }
+
+    [Parameter]
+    public List<string> BorderColors { get; set; }
+    
+    [Parameter]
+    public int BorderRadius { get; set; }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsObjectReference = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./ChartEntry.js");
+            var data = new ChartJsData(Labels, new List<Dataset>()
+            {
+                new Dataset("Snacker 1", BorderColors, Values, BorderRadius, BackgroundColors),
+            });
+
+            var config = new
+            {
+                type = Type,
+                data,
+                options = new
+                {
+                    responsive = true,
+                    maintainAspectRatio = false,
+                    events = new List<string>() {"click", "mousemove"},
+                    animations = new
+                    {
+                        tension = new
+                        {
+                            duration = 1000,
+                            easing = "linear",
+                            from = 1,
+                            to = 0,
+                            loop = true
+                        }
+                    },
+                    scales = new
+                    {
+                        y = new
+                        {
+                            min = 0,
+                            max = 100
+                        }
+                    },
+                    layout = new
+                    {
+                        padding = 0
+                    },
+                    plugins = new
+                    {
+                        title = new
+                        {
+                            display = true,
+                            text = "Snacker Use Times"
+                        },
+                        subtitle = new
+                        {
+                            display = false,
+                            text = "Custom Chart Subtitle"
+                        },
+                        tooltip = new
+                        {
+                            backgroundColor = "#FFFFFF",
+                            titleColor = "#000000",
+                            borderColor = "#181818",
+                            borderWidth = 1,
+                        }
+                    }
+                }
+            };
+            await _jsObjectReference.InvokeAsync<IJSObjectReference>("renderLineChart", _elementReference, config);
+        }
+    }
+
+}
